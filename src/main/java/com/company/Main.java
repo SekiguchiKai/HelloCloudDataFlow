@@ -16,17 +16,19 @@ import org.apache.beam.sdk.values.PCollection;
 public class Main {
     // DoFnを実装したクラス
     // DoFnの横の<T,T>でinputとoutputの方の定義を行う
-    // この場合、StringがinputでIntegerがoutput
     static class FilterEvenFn extends DoFn<String, String> {
         // 実際の処理ロジックにはこのアノテーションをつける
         @ProcessElement
-        // ProcessContextは、inputを表すobject
-        // 自分で定義しなくてもBeam SDKが勝手に取ってきてくれる
+        // 実際の処理ロジックは、processElementメソッドに記述する
+        // 引数のProcessContextを利用してinputやoutputを行う
         public void processElement(ProcessContext c) {
             System.out.print(c.element());
+            // ProcessContextからinput elementを取得
             int num = Integer.parseInt(c.element());
+            // input elementを使用した処理
             if (num % 2 == 0) {
                 System.out.println("ifの結果" + num);
+                // ProcessContextを使用して出力
                 c.output(String.valueOf(num));
             }
         }
@@ -47,13 +49,15 @@ public class Main {
         Pipeline pipeline = Pipeline.create(options);
 
         // inout dataを読み込んで、そこからPCollection(パイプライン内の一連のデータ)を作成する
-        PCollection<String> stringData = pipeline.apply(TextIO.read().from(INPUT_FILE_PATH));
+        PCollection<String> inputData = pipeline.apply(TextIO.read().from(INPUT_FILE_PATH));
 
         // 処理
-        PCollection<String> even = stringData.apply(ParDo.of(new FilterEvenFn()));
+        PCollection<String> evenData = inputData.apply(ParDo.of(new FilterEvenFn()));
         // 書き込む
-        even.apply(TextIO.write().to(OUTPUT_FILE_PATH));
+        evenData.apply(TextIO.write().to(OUTPUT_FILE_PATH));
 
+        // run : PipeLine optionで指定したRunnerで実行
+        // waitUntilFinish : PipeLineが終了するまで待って、最終的な状態を返す
         pipeline.run().waitUntilFinish();
     }
 }
