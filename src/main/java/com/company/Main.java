@@ -35,9 +35,9 @@ public class Main {
     }
 
     // インプットデータのパス
-    private static final String INPUT_FILE_PATH = "./dataflow_number_test.csv";
+    private static final String INPUT_FILE_PATH = "./src/main/resources/input/input.txt";
     // アウトデータのパス
-    private static final String OUTPUT_FILE_PATH = "./sample.csv";
+    private static final String OUTPUT_FILE_PATH = "./src/main/resources/result/result.txt";
 
     public static void main(String[] args) {
         // まずPipelineに設定するOptionを作成する
